@@ -24,6 +24,8 @@ impl Response {
     }
 
     pub fn format<'a>(&self) -> Vec<u8> {
+        // FIXME(andrew): is undefined status code an error that should
+        // be handled here?
         let status_text = match get_status_text(self.code) {
             Some(text) => text,
             None => String::from("UNDEFINED")

@@ -1,6 +1,7 @@
 use std::net::{TcpListener, TcpStream, Shutdown};
 use std::io::Write;
 use std::str;
+use std::fmt;
 
 use crate::request::Request;
 use crate::response::Response;
@@ -125,3 +126,10 @@ impl<T> HttpServer<T> where T: HttpHandler {
         };
     }
 }
+
+impl<T> fmt::Display for HttpServer<T> where T: HttpHandler {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        return write!(f, "HttpServer({}:{})", self.host, self.port);
+    }
+}
+

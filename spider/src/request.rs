@@ -5,7 +5,7 @@ use crate::http_method::HttpMethod;
 
 pub struct Request {
     pub method: HttpMethod,
-    path: String,
+    resource: String,
     http_version: String,
     headers: HashMap<String, String>,
     body: Vec<u8>,
@@ -13,13 +13,13 @@ pub struct Request {
 
 impl Request {
     pub fn new( method: HttpMethod
-              , path: String
+              , resource: String
               , http_version: String
               , headers: HashMap<String, String>
               , body: Vec<u8> ) -> Request {
         return Request {
             method,
-            path,
+            resource,
             http_version,
             headers,
             body,
@@ -60,18 +60,19 @@ impl Request {
             headers.insert(String::from(line[0]), line[1..].join(" "));
         }
 
-        let first_line = lines[0]
+        let request_line = lines[0]
             .trim_end_matches("\r\n")
             .split(" ")
             .collect::<Vec<&str>>();
 
-        let method = String::from(first_line[0]);
+        let method = String::from(request_line[0]);
         match HttpMethod::parse(method) {
             Some(method) =>
                 return Some(Request::new(
                     method,
-                    String::from(first_line[1]),
-                    String::from(first_line[2]),
+                    // TODO(andrew): add parsing of resource line.
+                    String::from(request_line[1]),
+                    String::from(request_line[2]),
                     headers,
                     body )),
             None => return None
@@ -81,7 +82,6 @@ impl Request {
 
 impl fmt::Display for Request {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        return write!(f, "Request({}, {})", self.method, self.path);
+        return write!(f, "Request({}, {})", self.method, self.resource);
     }
 }
-
