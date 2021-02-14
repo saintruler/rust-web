@@ -20,8 +20,8 @@ pub struct HttpServer<T: HttpHandler> {
 }
 
 impl<T> HttpServer<T> where T: HttpHandler {
-    // TODO(andrew): Add more verbose error handling.
-    pub fn new(host: &str, port: u16, handler: T) -> Option<HttpServer<T>> {
+    // TODO(andrew): add explanations for errors?
+    pub fn new(host: &str, port: u16, handler: T) -> Result<HttpServer<T>, &str> {
         let addr = format!("{}:{}", host, port);
         let sock = TcpListener::bind(addr);
         match sock {
@@ -32,37 +32,42 @@ impl<T> HttpServer<T> where T: HttpHandler {
                     socket: s,
                     handler: handler,
                 };
-                return Some(server);
+                return Ok(server);
             },
-            Err(_) => return None
-        }
+            Err(_) => return Err("Couldn't start server")
+        };
     }
 
-    pub fn serve_forever(&self) {
+    pub fn serve_forever(&self) -> Result<(), &str> {
         for stream in self.socket.incoming() {
             match stream {
                 Ok(s) => {
+                    // TODO(andrew): replace println with logging.
                     println!("Got connection!");
-                    self.handle_client(&s);
-                    // TODO(andrew): handle possible errors.
-                    s.shutdown(Shutdown::Both);
-                    println!("Connection hadled");
+                    match self.handle_client(&s) {
+                        Ok(_) => (),
+                        Err(msg) => return Err(msg)
+                    };
+                    match s.shutdown(Shutdown::Both) {
+                        Ok(_) => println!("Closed connection"),
+                        Err(_) => return Err("Couldn't close client socket")
+                    };
                 },
                 Err(_) => break
             };
         }
+        return Ok(());
     }
 
-    fn handle_client(&self, mut stream: &TcpStream) {
+    fn handle_client(&self, mut stream: &TcpStream) -> Result<(), &str> {
         let mut buf: [u8; 1024] = [0; 1024];
         // TODO(andrew): read all body, not first 1024 bytes.
         stream.peek(&mut buf).expect("Couldn't read from socket");
 
         let request = Request::from(&buf);
-        // TODO(andrew): remove panic.
         let request = match request {
             Some(r) => r,
-            None => panic!("Request parsed with errors")
+            None => return Err("Request parsed with errors")
         };
 
         // TODO(andrew): add more methods.
@@ -71,7 +76,9 @@ impl<T> HttpServer<T> where T: HttpHandler {
             HttpMethod::POST => self.handler.do_post(request)
         };
         let response = response.format();
-        // TODO(andrew): handle possible errors.
-        stream.write(&response);
+        match stream.write(&response) {
+            Ok(_) => return Ok(()),
+            Err(_) => return Err("Couldn't write to client socket")
+        };
     }
 }

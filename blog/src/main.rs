@@ -24,8 +24,13 @@ impl MyHandler {
 fn main() {
     let handler = MyHandler::new();
     let server = HttpServer::new("localhost", 3000, handler);
-    match server {
-        Some(serv) => serv.serve_forever(),
-        None => println!("Couldn't start server.")
-    }
+
+    let result = match server {
+        Ok(ref serv) => serv.serve_forever(),
+        Err(msg) => Err(msg)
+    };
+    match result {
+        Ok(_) => println!("Server exited succesfully"),
+        Err(msg) => println!("{}", msg)
+    };
 }
