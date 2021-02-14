@@ -113,7 +113,7 @@ fn format_response<'a>(response: Response) -> &'a [u8] {
     return buf;
 }
 
-fn handle_client(stream: TcpStream) {
+pub fn handle_client(stream: TcpStream) {
     let mut buf: [u8; 1024] = [0; 1024];
     stream.peek(&mut buf).expect("Couldn't read from socket");
 
@@ -136,13 +136,3 @@ fn handle_client(stream: TcpStream) {
     let response = format_response(response);
 }
 
-fn main() -> std::io::Result<()> {
-    let listener = TcpListener::bind("localhost:3000")?;
-
-    // accept connections and process them serially
-    for stream in listener.incoming() {
-        handle_client(stream?);
-    }
-
-    Ok(())
-}
