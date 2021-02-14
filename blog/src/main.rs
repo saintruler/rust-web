@@ -1,14 +1,31 @@
-use std::net::TcpListener;
+use spider::http_server::{HttpHandler, HttpServer};
+use spider::request::Request;
+use spider::response::Response;
 
-use spider::handle_client;
+struct MyHandler {}
 
-fn main() -> std::io::Result<()> {
-    let listener = TcpListener::bind("localhost:3000")?;
-
-    // accept connections and process them serially
-    for stream in listener.incoming() {
-        handle_client(stream?);
+impl HttpHandler for MyHandler {
+    fn do_get(&self, _request: Request) -> Response {
+        return Response::new("hey");
     }
 
-    Ok(())
+    fn do_post(&self, _request: Request) -> Response {
+        return Response::new("hey");
+    }
+}
+
+impl MyHandler {
+    pub fn new() -> MyHandler {
+        return MyHandler {};
+    }
+}
+
+
+fn main() {
+    let handler = MyHandler::new();
+    let server = HttpServer::new("localhost", 3000, handler);
+    match server {
+        Some(serv) => serv.serve_forever(),
+        None => println!("Couldn't start server.")
+    }
 }
