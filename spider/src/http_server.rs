@@ -1,4 +1,4 @@
-use std::net::{TcpListener, TcpStream};
+use std::net::{TcpListener, TcpStream, Shutdown};
 use std::io::Write;
 use std::str;
 
@@ -41,14 +41,17 @@ impl<T> HttpServer<T> where T: HttpHandler {
         for stream in self.socket.incoming() {
             match stream {
                 Ok(s) => {
-                    self.handle_client(s);
+                    println!("Got connection!");
+                    self.handle_client(&s);
+                    s.shutdown(Shutdown::Both);
+                    println!("Connection hadled");
                 },
                 Err(_) => break
             };
         }
     }
 
-    fn handle_client(&self, mut stream: TcpStream) {
+    fn handle_client(&self, &mut stream: TcpStream) {
         let mut buf: [u8; 1024] = [0; 1024];
         stream.peek(&mut buf).expect("Couldn't read from socket");
 
