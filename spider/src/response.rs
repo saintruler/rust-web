@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use std::fmt;
 
+// TODO(andrew): add more flexible status structure.
+// (Possibly with enum variants?)
 pub struct Response {
     status: i32,
     headers: HashMap<String, String>,
@@ -18,13 +20,10 @@ impl Response {
     }
 
     pub fn format<'a>(&self) -> &'a [u8] {
+        // TODO(andrew): replace placeholder response with actual 
+        // formatted response;
         let s = "HTTP/1.1 200 OK\r\nConnection: keep-alive\r\nContent-Type: text/html\r\n\r\n<i>Hello</i>";
         return s.as_bytes();
-
-        // let buf: &[u8];
-        // buf = &[0; 1024];
-//
-        // return buf;
     }
 }
 

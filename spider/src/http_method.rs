@@ -1,5 +1,6 @@
 use std::fmt;
 
+// TODO(andrew): add rest of the methods.
 pub enum HttpMethod {
     GET, POST
 }

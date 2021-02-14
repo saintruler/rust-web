@@ -7,6 +7,7 @@ use crate::response::Response;
 use crate::http_method::HttpMethod;
 
 pub trait HttpHandler {
+    // TODO(andrew): add default behaviour to handlers?
     fn do_get(&self, request: Request) -> Response;
     fn do_post(&self, request: Request) -> Response;
 }
@@ -55,6 +56,9 @@ impl<T> HttpServer<T> where T: HttpHandler {
         let mut buf: [u8; 1024] = [0; 1024];
         stream.peek(&mut buf).expect("Couldn't read from socket");
 
+        // TODO(andrew): parse only headers as string and leave decoding of
+        // body to handler.
+        // TODO(andrew): read all body, not first 1024 bytes.
         // TODO(andrew): remove panic.
         let s = match str::from_utf8(&buf) {
             Ok(v) => v,
@@ -68,6 +72,7 @@ impl<T> HttpServer<T> where T: HttpHandler {
             None => panic!("Request parsed with errors")
         };
 
+        // TODO(andrew): add more methods.
         let response = match request.method {
             HttpMethod::GET  => self.handler.do_get(request),
             HttpMethod::POST => self.handler.do_post(request)

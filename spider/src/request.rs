@@ -24,7 +24,8 @@ impl Request {
         };
     }
 
-    // TODO(andrew): Add some error handling.
+    // TODO(andrew): accept &[u8] instead of &str and add parsing of body.
+    // TODO(andrew): add some error handling.
     pub fn from(data: &str) -> Option<Request> {
         let lines = data.split("\r\n").collect::<Vec<&str>>();
 
