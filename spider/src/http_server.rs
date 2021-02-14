@@ -7,9 +7,46 @@ use crate::response::Response;
 use crate::http_method::HttpMethod;
 
 pub trait HttpHandler {
-    // TODO(andrew): add default behaviour to handlers?
-    fn do_get(&self, request: Request) -> Response;
-    fn do_post(&self, request: Request) -> Response;
+    fn do_get(&self, _request: Request) -> Response {
+        return self.default_action(_request);
+    }
+
+    fn do_head(&self, _request: Request) -> Response {
+        return self.default_action(_request);
+    }
+
+    fn do_post(&self, _request: Request) -> Response {
+        return self.default_action(_request);
+    }
+
+    fn do_put(&self, _request: Request) -> Response {
+        return self.default_action(_request);
+    }
+
+    fn do_delete(&self, _request: Request) -> Response {
+        return self.default_action(_request);
+    }
+
+    fn do_connect(&self, _request: Request) -> Response {
+        return self.default_action(_request);
+    }
+
+    fn do_options(&self, _request: Request) -> Response {
+        return self.default_action(_request);
+    }
+
+    fn do_trace(&self, _request: Request) -> Response {
+        return self.default_action(_request);
+    }
+
+    fn do_patch(&self, _request: Request) -> Response {
+        return self.default_action(_request);
+    }
+
+    fn default_action(&self, _request: Request) -> Response {
+        let msg = String::from("<h1>Method not allowed</h1>");
+        return Response::html(msg, 405);
+    }
 }
 
 pub struct HttpServer<T: HttpHandler> {
@@ -70,10 +107,16 @@ impl<T> HttpServer<T> where T: HttpHandler {
             None => return Err("Request parsed with errors")
         };
 
-        // TODO(andrew): add more methods.
         let response = match request.method {
-            HttpMethod::GET  => self.handler.do_get(request),
-            HttpMethod::POST => self.handler.do_post(request)
+            HttpMethod::GET     => self.handler.do_get(request),
+            HttpMethod::HEAD    => self.handler.do_head(request),
+            HttpMethod::POST    => self.handler.do_post(request),
+            HttpMethod::PUT     => self.handler.do_put(request),
+            HttpMethod::DELETE  => self.handler.do_delete(request),
+            HttpMethod::CONNECT => self.handler.do_connect(request),
+            HttpMethod::OPTIONS => self.handler.do_options(request),
+            HttpMethod::TRACE   => self.handler.do_trace(request),
+            HttpMethod::PATCH   => self.handler.do_patch(request),
         };
         let response = response.format();
         match stream.write(&response) {
