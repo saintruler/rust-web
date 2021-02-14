@@ -6,11 +6,11 @@ struct MyHandler {}
 
 impl HttpHandler for MyHandler {
     fn do_get(&self, _request: Request) -> Response {
-        return Response::new("hey");
+        return Response::html(String::from("hey"), 200);
     }
 
     fn do_post(&self, _request: Request) -> Response {
-        return Response::new("hey");
+        return Response::html(String::from("hey"), 200);
     }
 }
 

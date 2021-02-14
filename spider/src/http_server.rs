@@ -44,6 +44,7 @@ impl<T> HttpServer<T> where T: HttpHandler {
                 Ok(s) => {
                     println!("Got connection!");
                     self.handle_client(&s);
+                    // TODO(andrew): handle possible errors.
                     s.shutdown(Shutdown::Both);
                     println!("Connection hadled");
                 },
@@ -78,6 +79,7 @@ impl<T> HttpServer<T> where T: HttpHandler {
             HttpMethod::POST => self.handler.do_post(request)
         };
         let response = response.format();
-        stream.write(response);
+        // TODO(andrew): handle possible errors.
+        stream.write(&response);
     }
 }
