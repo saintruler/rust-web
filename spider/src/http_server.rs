@@ -55,18 +55,10 @@ impl<T> HttpServer<T> where T: HttpHandler {
 
     fn handle_client(&self, mut stream: &TcpStream) {
         let mut buf: [u8; 1024] = [0; 1024];
+        // TODO(andrew): read all body, not first 1024 bytes.
         stream.peek(&mut buf).expect("Couldn't read from socket");
 
-        // TODO(andrew): parse only headers as string and leave decoding of
-        // body to handler.
-        // TODO(andrew): read all body, not first 1024 bytes.
-        // TODO(andrew): remove panic.
-        let s = match str::from_utf8(&buf) {
-            Ok(v) => v,
-            Err(_) => panic!("Couldn't convert u8 to character")
-        };
-
-        let request = Request::from(&s);
+        let request = Request::from(&buf);
         // TODO(andrew): remove panic.
         let request = match request {
             Some(r) => r,

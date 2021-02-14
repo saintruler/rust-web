@@ -8,34 +8,62 @@ pub struct Request {
     path: String,
     http_version: String,
     headers: HashMap<String, String>,
-    // body: &'a [u8]
+    body: Vec<u8>,
 }
 
 impl Request {
     pub fn new( method: HttpMethod
               , path: String
               , http_version: String
-              , headers: HashMap<String, String>) -> Request {
+              , headers: HashMap<String, String>
+              , body: Vec<u8> ) -> Request {
         return Request {
             method,
             path,
             http_version,
-            headers
+            headers,
+            body,
         };
     }
 
-    // TODO(andrew): accept &[u8] instead of &str and add parsing of body.
     // TODO(andrew): add some error handling.
-    pub fn from(data: &str) -> Option<Request> {
-        let lines = data.split("\r\n").collect::<Vec<&str>>();
+    pub fn from(data: &[u8]) -> Option<Request> {
+        let mut lines: Vec<String> = Vec::new();
+        let mut line = String::new();
+        let mut idx = 0;
+        let mut char_count = 0;
+
+        // Parsing headers until first empty line (char_count == 0).
+        for c in data {
+            let c = *c as char;
+            line.push(c);
+            idx += 1;
+
+            if c == '\n' {
+                lines.push(line);
+                if char_count == 0 { break; }
+                else { line = String::new(); }
+            }
+            if c != '\r' && c != '\n' {
+                char_count += 1;
+            }
+        }
+
+        let body = data[idx..].to_vec();
 
         let mut headers: HashMap<String, String> = HashMap::new();
         for line in &lines[1..] {
-            let line = line.split(": ").collect::<Vec<&str>>();
+            let line = line
+                .trim_end_matches("\r\n")
+                .split(": ")
+                .collect::<Vec<&str>>();
             headers.insert(String::from(line[0]), line[1..].join(" "));
         }
 
-        let first_line = lines[0].split(" ").collect::<Vec<&str>>();
+        let first_line = lines[0]
+            .trim_end_matches("\r\n")
+            .split(" ")
+            .collect::<Vec<&str>>();
 
         let method = String::from(first_line[0]);
         match HttpMethod::parse(method) {
@@ -44,7 +72,8 @@ impl Request {
                     method,
                     String::from(first_line[1]),
                     String::from(first_line[2]),
-                    headers )),
+                    headers,
+                    body )),
             None => return None
         };
     }
@@ -55,3 +84,4 @@ impl fmt::Display for Request {
         return write!(f, "Request({}, {})", self.method, self.path);
     }
 }
+
