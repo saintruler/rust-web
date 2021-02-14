@@ -51,7 +51,7 @@ impl<T> HttpServer<T> where T: HttpHandler {
         }
     }
 
-    fn handle_client(&self, &mut stream: TcpStream) {
+    fn handle_client(&self, mut stream: &TcpStream) {
         let mut buf: [u8; 1024] = [0; 1024];
         stream.peek(&mut buf).expect("Couldn't read from socket");
 
