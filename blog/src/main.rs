@@ -1,6 +1,6 @@
-use spider::http_server::{HttpHandler, HttpServer};
-use spider::request::Request;
-use spider::response::Response;
+use spider_server::http_server::{HttpHandler, HttpServer};
+use spider_server::request::Request;
+use spider_server::response::Response;
 
 mod querystring;
 use crate::querystring::parse_qs;

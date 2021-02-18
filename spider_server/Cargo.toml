@@ -1,5 +1,5 @@
 [package]
-name = "spider"
+name = "spider_server"
 version = "0.1.0"
 authors = ["Andrew <saintruler@gmail.com>"]
 edition = "2018"

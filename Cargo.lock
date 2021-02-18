@@ -4,9 +4,9 @@
 name = "blog"
 version = "0.1.0"
 dependencies = [
- "spider",
+ "spider_server",
 ]
 
 [[package]]
-name = "spider"
+name = "spider_server"
 version = "0.1.0"

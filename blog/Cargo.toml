@@ -5,4 +5,4 @@ authors = ["Andrew <saintruler@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-spider = { path = "../spider" }
+spider_server = { path = "../spider_server" }

@@ -1,6 +1,6 @@
 [workspace]
 
 members = [
-    "spider",
+    "spider_server",
     "blog"
 ]
